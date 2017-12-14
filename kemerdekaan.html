@@ -1,0 +1,103 @@
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1" /> 
+</head>
+<div id="app">
+<div >{{error}}</div>
+<div v-show="hilang"><span v-html="success"></span>
+<p>
+  <button class="js-textareacopybtn" style="vertical-align:top;">click this to copy link</button>
+  <textarea class="js-copytextarea">{{link}}</textarea>
+</p>
+</div>
+<div id="hilang" v-show="!hilang" >
+    
+ <form @submit="panda">   
+input facebook video url:<input type="text" v-model="site"  id="site"/><br>
+input title for the video:<input type="text" v-model="title"  id="titties"/><br><input @click="panda" type="submit" id="submit"/>
+</form>
+</div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue-resource@1.3.4"></script>
+<script type="text/javascript" >
+var app = new Vue({
+  el: '#app',
+  data: {
+    message: 'Hello Vue!',
+    title:'',
+    site:'',
+    error:'',
+    hilang:false,
+    success:'',
+    link:''
+  },
+  methods:{panda:function(){
+      event.preventDefault()
+      var expression = /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi;
+var regex = new RegExp(expression);
+      const site=this.site
+      const title=this.title
+      if(site.match(regex)&&this.title){
+          this.hilang=true
+          this.error=''
+          this.success='please wait until video uploaded...'
+this.$http.post('/upload',{site:site,title:title}).then(response => {
+
+//     // get body data
+          if(response.body!=="error"){
+          this.success=`you can see your video here please wait 5 second for the video to successfully uploaded 
+          <a href="${response.body}">${response.body}</a><br><a href='/'>back</a>`
+          this.link=response.body
+      }else{
+          this.success="something went wrong please refresh the page<br><a href='/'>back</a>"
+      }
+
+  }, response => {
+    this.success="something went wrong please refresh the page<br><a href='/'>back</a>"
+    // error callback
+  });          
+      }else{
+          this.error="please only input site http or https"
+          console.log("please only input site http or https")
+      }
+       
+  }}
+})
+var copyTextareaBtn = document.querySelector('.js-textareacopybtn');
+
+copyTextareaBtn.addEventListener('click', function(event) {
+  var copyTextarea = document.querySelector('.js-copytextarea');
+  copyTextarea.select();
+
+  try {
+    var successful = document.execCommand('copy');
+    var msg = successful ? 'successful' : 'unsuccessful';
+    console.log('Copying text command was ' + msg);
+  } catch (err) {
+    console.log('Oops, unable to copy');
+  }
+});
+    // $("#submit").on("click",function(){
+    //  $("#hilang").html("please wait until video finish uploading...")
+    //  const site=$("input").eq(1).val()
+    // //  const title=$("#title").val().trim()
+    //  console.log($("input").eq(0).val())
+//      if(site!==""&&title!==""&&site!==undefined&&title!==undefined){
+// axios.get(`/upload?site=${site}&title=${title}`)         
+//      }else{
+//          $("#error").html("please fill all the blanks")
+//      }
+
+//         $.ajax({
+//         url: '/upload',
+//         type: 'POST',
+//         contentType: 'application/json',
+//           dataType: 'json',
+//         data: JSON.stringify(),
+//         success: function(data){
+      
+// }
+//         })
+    
+//  })
+</script>
